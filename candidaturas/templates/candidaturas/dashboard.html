@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard · JobTrack{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Olá, {{ user.username }} 👋</h1>
+        <p class="mt-1 text-sm text-slate-500">Aqui está um panorama das suas candidaturas.</p>
+    </div>
+    <a href="{% url 'nova' %}"
+       class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        Nova candidatura
+    </a>
+</div>
+
+{# KPI tiles #}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="rounded-xl bg-white p-5 ring-1 ring-slate-200 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div class="text-xs font-medium uppercase tracking-wider text-slate-500">Total</div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </div>
+        </div>
+        <div class="mt-3 text-3xl font-bold text-slate-900">{{ total }}</div>
+        <div class="mt-1 text-xs text-slate-500">candidaturas registradas</div>
+    </div>
+    <div class="rounded-xl bg-white p-5 ring-1 ring-slate-200 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div class="text-xs font-medium uppercase tracking-wider text-slate-500">Em andamento</div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+            </div>
+        </div>
+        <div class="mt-3 text-3xl font-bold text-slate-900">{{ ativos }}</div>
+        <div class="mt-1 text-xs text-slate-500">em análise, entrevista...</div>
+    </div>
+    <div class="rounded-xl bg-white p-5 ring-1 ring-slate-200 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div class="text-xs font-medium uppercase tracking-wider text-slate-500">Aprovadas</div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+        </div>
+        <div class="mt-3 text-3xl font-bold text-slate-900">{{ aprovados }}</div>
+        <div class="mt-1 text-xs text-slate-500">parabéns 🎉</div>
+    </div>
+    <div class="rounded-xl bg-white p-5 ring-1 ring-slate-200 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div class="text-xs font-medium uppercase tracking-wider text-slate-500">Taxa de entrevista</div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7 15l4-4 4 4 5-5"/></svg>
+            </div>
+        </div>
+        <div class="mt-3 text-3xl font-bold text-slate-900">{{ taxa_entrevista }}%</div>
+        <div class="mt-1 text-xs text-slate-500">chegaram à entrevista</div>
+    </div>
+</div>
+
+{# Charts #}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="rounded-xl bg-white p-6 ring-1 ring-slate-200 shadow-soft">
+        <h2 class="text-sm font-semibold text-slate-900">Distribuição por status</h2>
+        <p class="text-xs text-slate-500 mb-4">Como estão suas candidaturas agora.</p>
+        {% if total %}
+            <div class="h-64"><canvas id="chartStatus"></canvas></div>
+        {% else %}
+            <div class="h-64 flex items-center justify-center text-sm text-slate-400">Cadastre uma candidatura para ver o gráfico.</div>
+        {% endif %}
+    </div>
+    <div class="rounded-xl bg-white p-6 ring-1 ring-slate-200 shadow-soft lg:col-span-2">
+        <h2 class="text-sm font-semibold text-slate-900">Candidaturas por mês</h2>
+        <p class="text-xs text-slate-500 mb-4">Volume de candidaturas por mês da data da candidatura.</p>
+        {% if chart_meses_data %}
+            <div class="h-64"><canvas id="chartMeses"></canvas></div>
+        {% else %}
+            <div class="h-64 flex items-center justify-center text-sm text-slate-400">Sem dados ainda.</div>
+        {% endif %}
+    </div>
+</div>
+
+{# Status breakdown #}
+<div class="rounded-xl bg-white p-6 ring-1 ring-slate-200 shadow-soft mb-8">
+    <h2 class="text-sm font-semibold text-slate-900 mb-4">Resumo por status</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        {% for label, count in status_counts.items %}
+        <div class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-3">
+            <div class="text-xs text-slate-500 truncate">{{ label }}</div>
+            <div class="text-xl font-bold text-slate-900 mt-1">{{ count }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{# Recent list #}
+<div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-soft overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div>
+            <h2 class="text-sm font-semibold text-slate-900">Candidaturas recentes</h2>
+            <p class="text-xs text-slate-500">Últimas 5 vagas adicionadas.</p>
+        </div>
+        <a href="{% url 'lista' %}" class="text-sm font-medium text-brand-600 hover:text-brand-700">Ver todas →</a>
+    </div>
+    {% if recentes %}
+    <ul class="divide-y divide-slate-100">
+        {% for c in recentes %}
+        <li class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            <div class="min-w-0">
+                <a href="{% url 'detalhe' c.pk %}" class="text-sm font-semibold text-slate-900 hover:text-brand-700 truncate block">{{ c.cargo }}</a>
+                <div class="text-xs text-slate-500 mt-0.5">{{ c.empresa }} · {{ c.get_modalidade_display }}</div>
+            </div>
+            <div class="flex items-center gap-4 shrink-0">
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 {{ c.status_cor }}">{{ c.get_status_display }}</span>
+                <div class="text-xs text-slate-500 w-20 text-right">{{ c.data_candidatura|date:"d/m/Y" }}</div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="px-6 py-16 text-center">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5l5 5v11a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3 class="mt-3 text-sm font-semibold text-slate-900">Nenhuma candidatura ainda</h3>
+        <p class="mt-1 text-xs text-slate-500">Comece registrando a primeira vaga que você aplicou.</p>
+        <a href="{% url 'nova' %}" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">+ Nova candidatura</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if total %}
+<script>
+(function(){
+    const statusLabels = {{ chart_status_labels|safe }};
+    const statusData   = {{ chart_status_data|safe }};
+    const palette = ['#94a3b8','#f59e0b','#6366f1','#10b981','#f43f5e','#71717a'];
+    const ctx1 = document.getElementById('chartStatus');
+    if (ctx1) {
+      new Chart(ctx1, {
+        type: 'doughnut',
+        data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: palette, borderWidth: 0 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10, padding: 10 } } }
+        }
+      });
+    }
+})();
+</script>
+{% endif %}
+{% if chart_meses_data %}
+<script>
+(function(){
+    const ctx2 = document.getElementById('chartMeses');
+    if (ctx2) {
+      new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_meses_labels|safe }},
+            datasets: [{
+                label: 'Candidaturas',
+                data: {{ chart_meses_data|safe }},
+                backgroundColor: '#6366f1',
+                borderRadius: 6,
+                maxBarThickness: 36,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+      });
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Minhas candidaturas · JobTrack{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Minhas candidaturas</h1>
+        <p class="mt-1 text-sm text-slate-500">Veja, filtre e gerencie todas as vagas em que você se candidatou.</p>
+    </div>
+    <a href="{% url 'nova' %}"
+       class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        Nova candidatura
+    </a>
+</div>
+
+<form class="rounded-xl bg-white p-4 ring-1 ring-slate-200 shadow-soft mb-6 grid grid-cols-1 md:grid-cols-12 gap-3"
+      hx-get="{% url 'lista' %}"
+      hx-trigger="input delay:300ms from:input[name=q], change from:select"
+      hx-target="#tabela-wrapper"
+      hx-swap="innerHTML"
+      hx-push-url="true">
+    <div class="md:col-span-6">
+        <label class="block text-xs font-medium text-slate-600 mb-1">Buscar</label>
+        <div class="relative">
+            <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+            <input type="text" name="q" value="{{ q }}" placeholder="Empresa ou cargo..."
+                   class="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+        </div>
+    </div>
+    <div class="md:col-span-3">
+        <label class="block text-xs font-medium text-slate-600 mb-1">Status</label>
+        <select name="status" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+            <option value="">Todos</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status_atual == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="md:col-span-3">
+        <label class="block text-xs font-medium text-slate-600 mb-1">Modalidade</label>
+        <select name="modalidade" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+            <option value="">Todas</option>
+            {% for value, label in modalidade_choices %}
+                <option value="{{ value }}" {% if modalidade_atual == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+<div id="tabela-wrapper">
+    {% include 'candidaturas/_tabela.html' %}
+</div>
+{% endblock %}

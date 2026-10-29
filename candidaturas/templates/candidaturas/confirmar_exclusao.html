@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Excluir · JobTrack{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-soft p-6">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 text-rose-600 mx-auto">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M4.93 19.07A10 10 0 1119.07 4.93 10 10 0 014.93 19.07z"/></svg>
+        </div>
+        <h1 class="mt-4 text-center text-lg font-bold text-slate-900">Excluir candidatura?</h1>
+        <p class="mt-2 text-center text-sm text-slate-600">
+            Você está prestes a excluir <span class="font-semibold">{{ candidatura.cargo }}</span>
+            em <span class="font-semibold">{{ candidatura.empresa }}</span>. Essa ação não pode ser desfeita.
+        </p>
+        <form method="post" class="mt-6 flex items-center justify-center gap-3">
+            {% csrf_token %}
+            <a href="{% url 'lista' %}" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Cancelar</a>
+            <button type="submit" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Sim, excluir</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

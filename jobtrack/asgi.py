@@ -1,0 +1,8 @@
+"""Configuração ASGI do projeto JobTrack."""
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jobtrack.settings")
+
+application = get_asgi_application()

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }} · JobTrack{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <a href="{% url 'lista' %}" class="text-sm text-slate-500 hover:text-slate-900 inline-flex items-center gap-1">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Voltar
+        </a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900 tracking-tight">{{ titulo }}</h1>
+        <p class="mt-1 text-sm text-slate-500">Preencha as informações sobre a vaga.</p>
+    </div>
+
+    <form method="post" class="rounded-xl bg-white ring-1 ring-slate-200 shadow-soft p-6 space-y-5">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="rounded-lg bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.empresa.id_for_label }}">Empresa *</label>
+                {{ form.empresa }}
+                {% for e in form.empresa.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.cargo.id_for_label }}">Cargo *</label>
+                {{ form.cargo }}
+                {% for e in form.cargo.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.salario.id_for_label }}">Salário (R$)</label>
+                {{ form.salario }}
+                {% for e in form.salario.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.modalidade.id_for_label }}">Modalidade *</label>
+                {{ form.modalidade }}
+                {% for e in form.modalidade.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.data_candidatura.id_for_label }}">Data da candidatura *</label>
+                {{ form.data_candidatura }}
+                {% for e in form.data_candidatura.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.status.id_for_label }}">Status *</label>
+                {{ form.status }}
+                {% for e in form.status.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.link.id_for_label }}">Link da vaga</label>
+                {{ form.link }}
+                {% for e in form.link.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700" for="{{ form.observacoes.id_for_label }}">Observações</label>
+                {{ form.observacoes }}
+                {% for e in form.observacoes.errors %}<p class="mt-1 text-xs text-rose-600">{{ e }}</p>{% endfor %}
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+            <a href="{% url 'lista' %}" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Cancelar</a>
+            <button type="submit" class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">
+                {% if modo == 'editar' %}Salvar alterações{% else %}Cadastrar{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% if candidaturas %}
+<div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-soft overflow-hidden">
+    <div class="px-6 py-3 border-b border-slate-200 flex items-center justify-between">
+        <div class="text-xs text-slate-500">{{ total_filtrado }} resultado{{ total_filtrado|pluralize }}</div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Empresa / Cargo</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Modalidade</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Salário</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Data</th>
+                    <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+            {% for c in candidaturas %}
+                <tr id="row-{{ c.pk }}" class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <a href="{% url 'detalhe' c.pk %}" class="text-sm font-semibold text-slate-900 hover:text-brand-700 block">{{ c.cargo }}</a>
+                        <div class="text-xs text-slate-500 mt-0.5">{{ c.empresa }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 {{ c.status_cor }}">{{ c.get_status_display }}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-700">{{ c.get_modalidade_display }}</td>
+                    <td class="px-6 py-4 text-sm text-slate-700">
+                        {% if c.salario %}R$ {{ c.salario|floatformat:2 }}{% else %}<span class="text-slate-400">—</span>{% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">{{ c.data_candidatura|date:"d/m/Y" }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <a href="{% url 'detalhe' c.pk %}" title="Visualizar"
+                               class="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7S3.732 16.057 2.458 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </a>
+                            <a href="{% url 'editar' c.pk %}" title="Editar"
+                               class="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </a>
+                            <button title="Excluir"
+                                hx-post="{% url 'excluir' c.pk %}"
+                                hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                hx-confirm="Excluir essa candidatura permanentemente?"
+                                hx-target="#row-{{ c.pk }}"
+                                hx-swap="outerHTML swap:200ms"
+                                class="rounded-md p-1.5 text-rose-500 hover:bg-rose-50">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+<div class="rounded-xl bg-white p-12 text-center ring-1 ring-slate-200 shadow-soft">
+    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v4m-3 7l3-3m0 0l3 3m-3-3v9"/></svg>
+    </div>
+    <h3 class="mt-4 text-base font-semibold text-slate-900">Nenhuma candidatura encontrada</h3>
+    <p class="mt-1 text-sm text-slate-500">
+        {% if q or status_atual or modalidade_atual %}
+            Tente limpar os filtros ou buscar por outra palavra.
+        {% else %}
+            Comece registrando a primeira vaga em que você se candidatou.
+        {% endif %}
+    </p>
+    <a href="{% url 'nova' %}" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
+        + Nova candidatura
+    </a>
+</div>
+{% endif %}

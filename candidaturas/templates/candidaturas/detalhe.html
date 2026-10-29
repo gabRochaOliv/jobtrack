@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}{{ candidatura.cargo }} · JobTrack{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <a href="{% url 'lista' %}" class="text-sm text-slate-500 hover:text-slate-900 inline-flex items-center gap-1">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Voltar
+        </a>
+    </div>
+
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-soft overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200 flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">{{ candidatura.cargo }}</h1>
+                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 {{ candidatura.status_cor }}">{{ candidatura.get_status_display }}</span>
+                </div>
+                <div class="mt-1 text-sm text-slate-600">{{ candidatura.empresa }}</div>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'editar' candidatura.pk %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Editar</a>
+                <a href="{% url 'excluir' candidatura.pk %}" class="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50">Excluir</a>
+            </div>
+        </div>
+
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-6">
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Modalidade</dt>
+                <dd class="mt-1 text-sm text-slate-900">{{ candidatura.get_modalidade_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Salário</dt>
+                <dd class="mt-1 text-sm text-slate-900">
+                    {% if candidatura.salario %}R$ {{ candidatura.salario|floatformat:2 }}{% else %}—{% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Data da candidatura</dt>
+                <dd class="mt-1 text-sm text-slate-900">{{ candidatura.data_candidatura|date:"d/m/Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Última atualização</dt>
+                <dd class="mt-1 text-sm text-slate-900">{{ candidatura.atualizado_em|date:"d/m/Y H:i" }}</dd>
+            </div>
+            <div class="md:col-span-2">
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Link da vaga</dt>
+                <dd class="mt-1 text-sm text-slate-900 break-all">
+                    {% if candidatura.link %}
+                      {% if 'http://' in candidatura.link or 'https://' in candidatura.link %}
+                        <a href="{{ candidatura.link }}" target="_blank" rel="noopener" class="text-brand-600 hover:text-brand-700 underline">{{ candidatura.link }}</a>
+                      {% else %}
+                        {{ candidatura.link }}
+                      {% endif %}
+                    {% else %}
+                      —
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="md:col-span-2">
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Observações</dt>
+                <dd class="mt-1 text-sm text-slate-900 whitespace-pre-wrap">{{ candidatura.observacoes|default:"—" }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}

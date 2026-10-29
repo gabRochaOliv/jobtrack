@@ -1,0 +1,139 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}JobTrack{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+            colors: {
+              brand: {
+                50:  '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+                400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+                800: '#3730a3', 900: '#312e81',
+              }
+            },
+            boxShadow: {
+              soft: '0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06)',
+              card: '0 1px 3px 0 rgb(15 23 42 / 0.08), 0 10px 25px -10px rgb(15 23 42 / 0.12)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+      [x-cloak] { display: none !important; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+{% if user.is_authenticated %}
+<div class="flex min-h-screen">
+    <aside class="hidden lg:flex lg:w-64 lg:flex-col border-r border-slate-200 bg-white">
+        <div class="flex h-16 items-center gap-2 px-6 border-b border-slate-200">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">J</div>
+            <div class="font-bold text-slate-900 text-lg tracking-tight">JobTrack</div>
+        </div>
+        <nav class="flex-1 space-y-1 px-3 py-6">
+            {% url 'dashboard' as url_dashboard %}
+            {% url 'lista' as url_lista %}
+            {% url 'nova' as url_nova %}
+            <a href="{{ url_dashboard }}"
+               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                      {% if request.path == url_dashboard %}bg-brand-50 text-brand-700
+                      {% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0h6"/></svg>
+                Dashboard
+            </a>
+            <a href="{{ url_lista }}"
+               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                      {% if request.path == url_lista %}bg-brand-50 text-brand-700
+                      {% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                Minhas candidaturas
+            </a>
+            <a href="{{ url_nova }}"
+               class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                      {% if request.path == url_nova %}bg-brand-50 text-brand-700
+                      {% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Nova candidatura
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-200">
+            <div class="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700 font-semibold text-sm">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="truncate text-sm font-medium text-slate-900">{{ user.username }}</div>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs text-slate-500 hover:text-rose-600">Sair</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="lg:hidden flex items-center justify-between bg-white border-b border-slate-200 px-4 h-14">
+            <div class="flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-md bg-brand-600 text-white font-bold text-sm">J</div>
+                <span class="font-semibold">JobTrack</span>
+            </div>
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-sm text-slate-500">Sair</button></form>
+        </header>
+        <nav class="lg:hidden flex gap-2 bg-white border-b border-slate-200 px-4 py-2 overflow-x-auto whitespace-nowrap">
+            <a href="{% url 'dashboard' %}" class="rounded-lg px-3 py-2 text-sm font-medium {% if request.path == '/' %}bg-brand-50 text-brand-700{% else %}text-slate-600 hover:bg-slate-100{% endif %}">Dashboard</a>
+            <a href="{% url 'lista' %}" class="rounded-lg px-3 py-2 text-sm font-medium {% if '/candidaturas/' in request.path and request.path != '/candidaturas/nova/' %}bg-brand-50 text-brand-700{% else %}text-slate-600 hover:bg-slate-100{% endif %}">Candidaturas</a>
+            <a href="{% url 'nova' %}" class="rounded-lg px-3 py-2 text-sm font-medium {% if request.path == '/candidaturas/nova/' %}bg-brand-50 text-brand-700{% else %}text-slate-600 hover:bg-slate-100{% endif %}">Nova</a>
+        </nav>
+
+        <main class="flex-1 overflow-y-auto">
+            {% if messages %}
+            <div class="px-6 pt-6 space-y-2">
+              {% for m in messages %}
+                <div class="rounded-lg border px-4 py-3 text-sm
+                    {% if m.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800
+                    {% elif m.tags == 'error' %}border-rose-200 bg-rose-50 text-rose-800
+                    {% else %}border-slate-200 bg-white text-slate-700{% endif %}">
+                    {{ m }}
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="px-6 py-8 max-w-7xl mx-auto">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+{% else %}
+    {% if messages %}
+    <div class="fixed top-4 right-4 z-50 space-y-2">
+      {% for m in messages %}
+        <div class="rounded-lg border px-4 py-3 text-sm shadow
+            {% if m.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800
+            {% elif m.tags == 'error' %}border-rose-200 bg-rose-50 text-rose-800
+            {% else %}border-slate-200 bg-white text-slate-700{% endif %}">{{ m }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block anon_content %}{% endblock %}
+{% endif %}
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

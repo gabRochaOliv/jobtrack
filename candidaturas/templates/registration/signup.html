@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Criar conta · JobTrack{% endblock %}
+
+{% block anon_content %}
+<div class="min-h-screen grid lg:grid-cols-2">
+    <div class="hidden lg:flex flex-col justify-between bg-gradient-to-br from-brand-700 via-brand-600 to-indigo-500 text-white p-12">
+        <div class="flex items-center gap-2">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 backdrop-blur font-bold">J</div>
+            <span class="font-bold text-xl">JobTrack</span>
+        </div>
+        <div class="space-y-6 max-w-md">
+            <h1 class="text-4xl font-bold leading-tight">Comece a organizar sua jornada profissional.</h1>
+            <p class="text-brand-100 text-lg">Em menos de um minuto você tem seu painel pessoal de candidaturas.</p>
+        </div>
+        <div class="text-sm text-brand-100">Dados ficam salvos localmente, sem compartilhamento.</div>
+    </div>
+
+    <div class="flex items-center justify-center p-8">
+        <div class="w-full max-w-sm space-y-6">
+            <div class="lg:hidden flex items-center gap-2 mb-4">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white font-bold">J</div>
+                <span class="font-bold text-lg">JobTrack</span>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Criar sua conta</h2>
+                <p class="mt-1 text-sm text-slate-500">Escolha um nome de usuário e uma senha.</p>
+            </div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {% for field in form %}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="mt-1 text-xs text-slate-500 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-0.5">{{ field.help_text|safe }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="mt-1 text-xs text-rose-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <button type="submit"
+                        class="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-colors">
+                    Criar conta
+                </button>
+            </form>
+
+            <div class="text-center text-sm text-slate-500">
+                Já tem conta?
+                <a href="{% url 'login' %}" class="font-semibold text-brand-600 hover:text-brand-700">Entrar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
