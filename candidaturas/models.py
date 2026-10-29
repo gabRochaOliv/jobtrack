@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django.conf import settings
 from django.db import models
 
@@ -45,6 +47,15 @@ class Candidatura(models.Model):
 
     def __str__(self):
         return f"{self.cargo} @ {self.empresa}"
+
+    @property
+    def safe_link(self):
+        if not self.link:
+            return None
+        scheme = urlparse(self.link).scheme.lower()
+        if scheme in ("http", "https"):
+            return self.link
+        return None
 
     @property
     def status_cor(self):

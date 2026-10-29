@@ -48,8 +48,8 @@
                 <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Link da vaga</dt>
                 <dd class="mt-1 text-sm text-slate-900 break-all">
                     {% if candidatura.link %}
-                      {% if 'http://' in candidatura.link or 'https://' in candidatura.link %}
-                        <a href="{{ candidatura.link }}" target="_blank" rel="noopener" class="text-brand-600 hover:text-brand-700 underline">{{ candidatura.link }}</a>
+                      {% if candidatura.safe_link %}
+                        <a href="{{ candidatura.safe_link }}" target="_blank" rel="noopener noreferrer" class="text-brand-600 hover:text-brand-700 underline">{{ candidatura.link }}</a>
                       {% else %}
                         {{ candidatura.link }}
                       {% endif %}
